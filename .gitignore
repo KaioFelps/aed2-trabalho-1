@@ -1,0 +1,5 @@
+easexx
+.vscode/settings.json
+vcpkg_installed/
+build/
+.DS_Store
