@@ -28,3 +28,8 @@ Caso utilize outro compilador que não o g++, altere o campo `compiler`.
 Note que o compilador escolhido deve atender aos mesmos comandos que o g++.
 
 [instalação do (Rust e) Cargo]: https://www.rust-lang.org/tools/install
+
+## Serialização e deserialização
+A implementação de (de)serialização está especificada no documento [Serialização].
+
+[Serialização]: ./docs/serialization.md
