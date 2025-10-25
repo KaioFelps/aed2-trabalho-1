@@ -39,8 +39,8 @@ public:
 class Indexer
 {
 private:
-  Index index;
   std::filesystem::path index_data_file;
+  Index index;
 
 public:
   Indexer(std::filesystem::path index_data_file);
