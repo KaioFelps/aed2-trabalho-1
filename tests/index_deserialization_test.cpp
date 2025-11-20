@@ -1,9 +1,10 @@
+#include "unit_test.hpp"
+
 #include "errors/malformed_data_file.hpp"
 #include "file.hpp"
 #include "index_serializer.hpp"
 #include <catch2/catch_all.hpp>
 #include <filesystem>
-
 #include <iostream>
 
 namespace fs = std::filesystem;

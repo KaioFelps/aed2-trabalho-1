@@ -9,7 +9,11 @@ namespace core
 
 class IndexSerializer
 {
+#ifdef UNIT_TEST
+public:
+#else
 private:
+#endif
   std::filesystem::path data_dir;
   std::filesystem::path words_file;
   std::filesystem::path index_file;
