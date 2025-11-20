@@ -25,14 +25,6 @@ private:
 
   void remove_data_files() noexcept;
 
-public:
-  IndexSerializer(std::filesystem::path data_dir,
-                  std::filesystem::path words_file,
-                  std::filesystem::path index_file);
-
-  void serialize(Index &index);
-  std::optional<Index> deserialize();
-
   static std::unordered_map<std::string, std::set<std::string>>
   deserialize_words_map(std::istream &rstream,
                         const std::filesystem::path &data_file_path);
@@ -40,6 +32,14 @@ public:
   static std::set<File>
   deserialize_files_set(std::istream &rstream,
                         const std::filesystem::path &data_file_path);
+
+public:
+  IndexSerializer(std::filesystem::path data_dir,
+                  std::filesystem::path words_file,
+                  std::filesystem::path index_file);
+
+  void serialize(Index &index);
+  std::optional<Index> deserialize();
 };
 
 } // namespace core
