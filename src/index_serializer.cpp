@@ -22,6 +22,32 @@ IndexSerializer::IndexSerializer(std::filesystem::path data_dir,
 {
 }
 
+void IndexSerializer::serialize(Index &index)
+{
+  const auto words_data_file = this->data_dir / this->words_file;
+  auto words_map_stream = std::ofstream(words_data_file, std::ios::binary);
+
+  const auto index_data_file = this->data_dir / this->index_file;
+  auto files_set_stream = std::ofstream(index_data_file, std::ios::binary);
+
+  if (!words_map_stream.is_open() || !files_set_stream.is_open())
+  {
+    throw std::runtime_error(
+        "Não foi possível persistir o índice no sistema de arquivos.");
+  }
+
+  try
+  {
+    serialize_words_map(index.words, words_map_stream);
+    serialize_files_set(index.files, files_set_stream);
+  }
+  catch (const std::exception &exception)
+  {
+    this->remove_data_files();
+    throw exception;
+  }
+}
+
 std::optional<Index> IndexSerializer::deserialize()
 {
   const auto words_data_file = this->data_dir / this->words_file;
@@ -51,8 +77,7 @@ std::optional<Index> IndexSerializer::deserialize()
 }
 
 void IndexSerializer::ensure_data_has_not_reached_end(
-    const std::istream &rstream,
-    const std::filesystem::path &file) noexcept(false)
+    const std::istream &rstream, const std::filesystem::path &file)
 {
   if (rstream.good()) return;
   throw errors::MalformedDataFileException(

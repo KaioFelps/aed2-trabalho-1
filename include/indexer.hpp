@@ -15,6 +15,8 @@ namespace core
 
 class Index
 {
+  friend class IndexSerializer;
+
 private:
   std::vector<File> files;
   words_map_t words;
