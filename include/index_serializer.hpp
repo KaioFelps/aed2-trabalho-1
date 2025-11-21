@@ -45,7 +45,7 @@ public:
                   std::filesystem::path words_file,
                   std::filesystem::path index_file);
 
-  void serialize(Index &index);
+  void serialize(const Index &index);
   std::optional<Index> deserialize();
 };
 

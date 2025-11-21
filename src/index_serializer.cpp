@@ -22,7 +22,7 @@ IndexSerializer::IndexSerializer(std::filesystem::path data_dir,
 {
 }
 
-void IndexSerializer::serialize(Index &index)
+void IndexSerializer::serialize(const Index &index)
 {
   const auto words_data_file = this->data_dir / this->words_file;
   auto words_map_stream = std::ofstream(words_data_file, std::ios::binary);
