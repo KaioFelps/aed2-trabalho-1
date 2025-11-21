@@ -1,4 +1,4 @@
-# Serialização
+# Protocolo binário para (de)serializar um índice
 Esse documento descreve os protocolos binários de serialização e deserialização
 utilizado para armazenar o índice num arquivo binário.
 
@@ -8,9 +8,7 @@ utilizado para armazenar o índice num arquivo binário.
 2. o arquivo do mapa de palavras, que mapeia cada palavra para um conjunto de IDs
   dos arquivos (`File`) nos quais foi citada ao menos uma vez.
 
-## Interpretando um arquivo binário
-
-### Sequências de tamanho
+## Sequências de tamanho
 As sequências de bits prefixadas com "tamanho_" na representação em XML acima
 servem para descrever o tamanho de cada parte do arquivo final a ser montado
 quando finalmente deserializado.
@@ -43,7 +41,7 @@ a um item específico.
 
 ### Mapa de palavras
 Esse mapa, na sua versão virtual — isto é, sua representação por tipos C++ —,
-é uma instância de `std::unordered_map<std::string, std::set<std::string>>`,
+é uma instância de `std::unordered_map<std::string, std::unordered_set<std::string>>`,
 onde a chave é uma palavra e o valor é um conjunto de IDs de arquivos (`File`).
 
 Sua representação binária tem o seguinte formato:
@@ -54,13 +52,11 @@ Sua representação binária tem o seguinte formato:
   <quantidade_de_items_no_conjunto size="32" virtual-type="uint32_t" />
   <chave virtual-type="std::string" />
   <item n="1">
-    <tamanho_id size="32" virtual-type="uint32_t" />
-    <id virtual-type="std::string" />
+    <id size="64" virtual-type="uint64_t" />
   </item n="1">
     ⠇
   <item n="n">
-    <tamanho_id size="32" virtual-type="uint32_t" />
-    <id virtual-type="std::string" />
+    <id size="64" virtual-type="uint64_t" />
   </item n="n">
 </tupla>
 ```
@@ -78,32 +74,27 @@ interpretada como uma instância de `std::string` (C++).
 
 Para cada ocorrência de `<item>` (número de ocorrências variável, porém informado
 pela tag `<quantidade_de_items_no_conjunto`), deve-se interpretar da seguinte forma
-[de modo a se obter uma instância do tipo `std::set<File>` (C++)]:
-- a sequência descrita pela tag `<tamanho_id />` descreve o tamanho da string contendo o ID
-  (`File::id`) da instância de `File` sendo deserializada;
-- a tag `<id />`, de tamanho variável discriminado pelo valor dos bits de `<tamanho_id>`,
-  deve ser interpretada como uma instância de `std::string` (C++) e como o campo `id`
-  desta instância de `File`.
+[de modo a se obter uma instância do tipo `std::unordered_set<uint64_t>` (C++)]:
+- a tag `<id />`, de 64 bits deve ser interpretada como `uint64_t` (C++) e como o `id`
+  de alguma instância de `File` existente no vetor de arquivos.
 
-### Índice
+## Arquivos
 
-O índice — representado, virtualmente, por `std::set<File>` — é um conjunto de
-`File`s. Cada instância de `File` é uma tupla {id, caminho} de um arquivo real.
-Dessa forma, podemos representá-lo, binariamente, da seguinte maneira:
+Os índices do mapa de palavras servem para encontrar a posição do documento neste vetor e,
+dessa forma, descobrir qual o documento que contém determinada palavra de uma forma mais
+econômica — armazenando os IDs nas listas do mapa ao invés do caminho completo.
+Portanto, trata-se de uma instância de `std::vector<File>`. Podemos representá-lo,
+binariamente, da seguinte maneira:
 
 ```xml
 <quantidade_de_items size="32" virtual-type="uint32_t" />
 <tupla n="1">
-  <tamanho_id size="32" virtual-type="uint32_t" />
   <tamanho_caminho size="32" virtual-type="uint32_t" />
-  <id />
   <caminho />
 </tupla>
   ⠇
 <tupla n="n">
-    <tamanho_id size="32" virtual-type="uint32_t" />
     <tamanho_caminho size="32" virtual-type="uint32_t" />
-    <id />
     <caminho />
 </tupla>
 ```
@@ -114,11 +105,13 @@ deserializadas dentro deste arquivo.
 
 Para cada tupla (que, lembrando, é apenas uma marcação e não um valor real), devemos
 interpretar:
-- a sequência representada pela tag `<tamanho_id>` como o tamanho (em bytes) do `<id>`;
-- a sequência representada pela tag `<tamanho_caminho>` como o tamanho  (em bytes)
+- a sequência representada pela tag `<tamanho_caminho>` como o tamanho (em bytes)
   do `<caminho>`;
-- a sequência representada pela tag `<id />`, de tamanho variável discriminado pelo valor
-  de `<tamanho_id>`, como uma `std::string` (C++) e como o valor de `File::id`;
 - a sequência representada pela tag `<caminho />`, de tamanho variável discriminado pelo
   valor de `<tamanho_caminho>`, como uma instância de `std::string` (C++) e como valor
   de `File::path`.
+
+## O índice
+Tendo tanto o mapa quanto o vetor de arquivos, basta utilizá-los para instanciar a classe
+`Index`. Caso o objetivo seja serializá-la, basta serializar cada um dos seus componentes
+internos conforme as descrições acima.

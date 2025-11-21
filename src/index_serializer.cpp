@@ -24,9 +24,9 @@ IndexSerializer::IndexSerializer(std::filesystem::path data_dir,
 
 std::optional<Index> IndexSerializer::deserialize()
 {
-  const auto words_data_file_path = this->data_dir / this->words_file;
+  const auto words_data_file = this->data_dir / this->words_file;
   auto words_map_stream =
-      std::ifstream(words_data_file_path, std::ios::binary | std::ios::in);
+      std::ifstream(words_data_file, std::ios::binary | std::ios::in);
 
   const auto index_data_file = this->data_dir / this->index_file;
   auto files_set_stream =
@@ -41,16 +41,13 @@ std::optional<Index> IndexSerializer::deserialize()
     return std::nullopt;
   }
 
-  auto _words_map =
-      this->deserialize_words_map(words_map_stream, words_data_file_path);
-
+  auto words = this->deserialize_words_map(words_map_stream, words_data_file);
   auto files = this->deserialize_files_set(files_set_stream, index_data_file);
 
   words_map_stream.close();
   files_set_stream.close();
 
-  auto words_map = this->map_words_map_files_ids_to_files(files, _words_map);
-  return Index(files, words_map);
+  return Index(files, words);
 }
 
 void IndexSerializer::ensure_data_has_not_reached_end(
@@ -62,12 +59,11 @@ void IndexSerializer::ensure_data_has_not_reached_end(
       file, "O arquivo finalizou sem completar a serialização.");
 }
 
-std::unordered_map<std::string, std::set<std::string>>
-IndexSerializer::deserialize_words_map(
+words_map_t IndexSerializer::deserialize_words_map(
     std::istream &binary_data,
     const std::filesystem::path &words_data_file_path)
 {
-  auto words_map = std::unordered_map<std::string, std::set<std::string>>();
+  auto words_map = words_map_t();
 
   uint32_t tuples_amount;
   binary_data.read(reinterpret_cast<char *>(&tuples_amount), 32 / 8);
@@ -89,14 +85,9 @@ IndexSerializer::deserialize_words_map(
 
     for (size_t _item_cursor = 0; _item_cursor < set_length; _item_cursor++)
     {
-      uint32_t id_size;
-      binary_data.read(reinterpret_cast<char *>(&id_size), 32 / 8);
-
-      auto id = std::string();
-      id.reserve(id_size);
-      binary_data.read(reinterpret_cast<char *>(&id_size), 32 / 8);
-
-      if (id.size() == id_size) set.insert(id);
+      uint64_t id;
+      binary_data.read(reinterpret_cast<char *>(&id), 64 / 8);
+      set.insert(id);
     }
 
     if (set.size() != set_length)
@@ -117,10 +108,10 @@ IndexSerializer::deserialize_words_map(
   return words_map;
 }
 
-std::set<File> IndexSerializer::deserialize_files_set(
+std::vector<File> IndexSerializer::deserialize_files_set(
     std::istream &stream, const std::filesystem::path &index_data_file)
 {
-  auto files_set = std::set<File>();
+  auto files = std::vector<File>();
 
   uint32_t set_length;
   stream.read(reinterpret_cast<char *>(&set_length), 32 / 8);
@@ -128,15 +119,10 @@ std::set<File> IndexSerializer::deserialize_files_set(
 
   for (size_t tuples_cursor = 0; tuples_cursor < set_length; tuples_cursor++)
   {
-    uint32_t id_size;
     uint32_t path_size;
-    stream.read(reinterpret_cast<char *>(&id_size), 32 / 8);
     stream.read(reinterpret_cast<char *>(&path_size), 32 / 8);
 
-    auto id = std::string(id_size, 0);
     auto path = std::string(path_size, 0);
-
-    stream.read(reinterpret_cast<char *>(id.data()), id_size);
     stream.read(reinterpret_cast<char *>(path.data()), path_size);
 
     if (tuples_cursor < set_length)
@@ -144,10 +130,10 @@ std::set<File> IndexSerializer::deserialize_files_set(
       ensure_data_has_not_reached_end(stream, index_data_file);
     }
 
-    files_set.insert(File(std::move(id), std::move(path)));
+    files.push_back(File(std::move(path)));
   }
 
-  if (files_set.size() != set_length)
+  if (files.size() != set_length)
   {
     throw errors::MalformedDataFileException(
         index_data_file,
@@ -155,44 +141,10 @@ std::set<File> IndexSerializer::deserialize_files_set(
             "Encontrado tamanho inesperado de arquivos. Esperava-se {}, "
             "instâncias de `File`, mas foram recebidas {} até o final do "
             "arquivo.",
-            set_length, files_set.size()));
+            set_length, files.size()));
   }
 
-  return files_set;
-}
-
-std::unordered_map<std::string, std::set<File>>
-IndexSerializer::map_words_map_files_ids_to_files(
-    const std::set<File> &files,
-    const std::unordered_map<std::string, std::set<std::string>> &words_map)
-{
-  auto words_final_map = std::unordered_map<std::string, std::set<File>>();
-
-  for (auto &pair : words_map)
-  {
-    auto &files_set = words_final_map[pair.first];
-    auto &files_ids = pair.second;
-
-    std::for_each(files_ids.begin(), files_ids.end(),
-                  [&files, &files_set](const std::string &file_id)
-                  {
-                    auto file = std::find_if(
-                        files.begin(), files.end(), [&file_id](const File &file)
-                        { return file.get_id() == file_id; });
-
-                    if (file == files.end())
-                    {
-                      throw errors::MalformedDataFileException(std::format(
-                          "Não foi encontrado nenhum arquivo registrado com o "
-                          "ID {}, embora esperava-se que houvesse um.",
-                          file_id));
-                    }
-
-                    files_set.insert(*file);
-                  });
-  }
-
-  return words_final_map;
+  return files;
 }
 
 void IndexSerializer::remove_data_files() noexcept
@@ -201,4 +153,5 @@ void IndexSerializer::remove_data_files() noexcept
   remove(this->data_dir / this->index_file);
   remove(this->data_dir / this->words_file);
 }
+
 } // namespace core

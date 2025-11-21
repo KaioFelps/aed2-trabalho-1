@@ -3,8 +3,12 @@
 #include "file.hpp"
 #include <filesystem>
 #include <optional>
-#include <set>
 #include <unordered_map>
+#include <unordered_set>
+#include <vector>
+
+#define words_map_t                                                            \
+  std::unordered_map<std::string, std::unordered_set<uint64_t>>
 
 namespace core
 {
@@ -12,8 +16,8 @@ namespace core
 class Index
 {
 private:
-  std::set<File> files;
-  std::unordered_map<std::string, std::set<File>> words;
+  std::vector<File> files;
+  words_map_t words;
 
   /**
    * Associa a palavra ao arquivo através do seu ID interno.
@@ -22,8 +26,7 @@ private:
 
 public:
   Index();
-  Index(std::set<File> files,
-        std::unordered_map<std::string, std::set<File>> words);
+  Index(std::vector<File> files, words_map_t words);
   /**
    * Registra a ocorrência da palavra `word` no arquivo localizado em
    * `file_path`.
@@ -33,7 +36,7 @@ public:
   /**
    * Obtém um conjunto de arquivos contendo a palavra `word`.
    */
-  std::set<const File> get_files_containing_word(std::string word) noexcept;
+  std::vector<const File> get_files_containing_word(std::string word) noexcept;
 };
 
 class Indexer

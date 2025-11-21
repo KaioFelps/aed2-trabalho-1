@@ -3,14 +3,11 @@
 namespace core
 {
 
-Index::Index(std::set<File> files,
-             std::unordered_map<std::string, std::set<File>> words)
+Index::Index(std::vector<File> files, words_map_t words)
     : files(files), words(words)
 {
 }
 
-Index::Index()
-    : files(std::set<File>()),
-      words(std::unordered_map<std::string, std::set<File>>()) {};
+Index::Index() : files(std::vector<File>()), words(words_map_t()) {};
 
 } // namespace core
