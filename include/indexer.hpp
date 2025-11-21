@@ -3,12 +3,16 @@
 #include "file.hpp"
 #include <filesystem>
 #include <optional>
+#include <set>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 #define words_map_t                                                            \
   std::unordered_map<std::string, std::unordered_set<uint64_t>>
+
+#define files_refs_set_t                                                       \
+  std::set<std::reference_wrapper<const File>, File::RefComparer>
 
 namespace core
 {
@@ -38,7 +42,8 @@ public:
   /**
    * Obtém um conjunto de arquivos contendo a palavra `word`.
    */
-  std::vector<const File> get_files_containing_word(std::string word) noexcept;
+  files_refs_set_t
+  get_files_containing_words(std::vector<std::string> word) noexcept;
 };
 
 class Indexer
