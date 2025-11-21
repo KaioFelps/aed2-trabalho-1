@@ -48,28 +48,32 @@ public:
 
 class Indexer
 {
+#ifdef UNIT_TEST
+public:
+#else
 private:
+#endif
   std::filesystem::path index_data_dir;
   std::optional<Index> index;
-  Indexer(std::filesystem::path index_data_dir);
 
 public:
+  Indexer(std::filesystem::path index_data_dir);
   /**
    * Obtém a instância corrente do indexador.
    */
-  Index &get_index() noexcept;
+  Index &get_index();
   /**
    * Carrega os dados de arquivos na memória.
    */
-  void try_load() noexcept(false);
+  void try_load();
   /**
    * Persiste os dados do indexador no disco rígido.
    */
-  void flush() const noexcept(false);
+  void flush() const;
   /**
    * Verifica se o índice pôde ser carregado e reconstruído em memória.
    */
-  bool has_loaded_index() const;
+  bool has_loaded_index() const noexcept;
 };
 
 } // namespace core

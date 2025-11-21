@@ -21,7 +21,7 @@ Indexer::Indexer(std::filesystem::path index_data_dir)
 {
 }
 
-Index &Indexer::get_index() noexcept
+Index &Indexer::get_index() noexcept(false)
 {
   if (!this->index.has_value())
   {
@@ -60,6 +60,9 @@ void Indexer::flush() const noexcept(false)
   serializer.serialize(this->index.value());
 }
 
-bool Indexer::has_loaded_index() const { return this->index.has_value(); }
+bool Indexer::has_loaded_index() const noexcept(true)
+{
+  return this->index.has_value();
+}
 
 } // namespace core
