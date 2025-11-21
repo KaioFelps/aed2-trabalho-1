@@ -46,7 +46,7 @@ onde a chave é uma palavra e o valor é um conjunto de IDs de arquivos (`File`)
 
 Sua representação binária tem o seguinte formato:
 ```xml
-<quantidade_de_tuplas />
+<quantidade_de_tuplas size="32" virtual-type="uint32_t" />
 <tupla>
   <tamanho_chave size="32" virtual-type="uint32_t" />
   <quantidade_de_items_no_conjunto size="32" virtual-type="uint32_t" />
