@@ -22,6 +22,8 @@ private:
   ensure_data_has_not_reached_end(const std::istream &rstream,
                                   const std::filesystem::path &file);
 
+  static void ensure_write_is_successful(const std::ostream &stream);
+
   void remove_data_files() noexcept;
 
   static words_map_t

@@ -159,6 +159,7 @@ void IndexSerializer::serialize_words_map(const words_map_t &words_map,
 {
   const auto map_size = static_cast<uint32_t>(words_map.size());
   wstream.write(reinterpret_cast<const char *>(&map_size), sizeof(uint32_t));
+  ensure_write_is_successful(wstream);
 
   for (const auto &pair : words_map)
   {
@@ -170,10 +171,12 @@ void IndexSerializer::serialize_words_map(const words_map_t &words_map,
                   sizeof(uint32_t));
 
     wstream.write(pair.first.data(), key_size);
+    ensure_write_is_successful(wstream);
 
     for (const auto &id : pair.second)
     {
       wstream.write(reinterpret_cast<const char *>(&id), sizeof(uint64_t));
+      ensure_write_is_successful(wstream);
     }
   }
 }
@@ -189,7 +192,15 @@ void IndexSerializer::serialize_files_set(const std::vector<File> &files,
     const auto path_size = static_cast<uint32_t>(file.get_path().size());
     wstream.write(reinterpret_cast<const char *>(&path_size), sizeof(uint32_t));
     wstream.write(file.get_path().data(), path_size);
+    ensure_write_is_successful(wstream);
   }
+}
+
+void IndexSerializer::ensure_write_is_successful(const std::ostream &stream)
+{
+  if (!stream.fail()) return;
+  throw std::runtime_error("Não foi possivel persistir o índice no "
+                           "armazenamento devido a um erro inesperado.");
 }
 
 } // namespace core
