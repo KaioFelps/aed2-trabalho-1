@@ -21,7 +21,11 @@ class Index
 {
   friend class IndexSerializer;
 
+#ifdef UNIT_TEST
+public:
+#else
 private:
+#endif
   std::vector<File> files;
   words_map_t words;
 

@@ -23,6 +23,29 @@ std::reference_wrapper<File> Index::get_file_by_id(const uint64_t &id)
   return std::ref(this->files[index]);
 }
 
+void Index::add_word_from_file(std::string word,
+                               std::filesystem::path file_path) noexcept
+{
+  auto file_found = std::find_if(this->files.begin(), this->files.end(),
+                                 [&file_path](const File &file)
+                                 { return file.get_path() == file_path; });
+
+  uint64_t id;
+
+  if (file_found != this->files.end())
+  {
+    id = std::distance(this->files.begin(), file_found) + 1;
+  }
+  else
+  {
+    this->files.push_back(File(file_path.string()));
+    id = this->files.size();
+  }
+
+  auto &files_containing_word = this->words[word];
+  files_containing_word.insert(id);
+}
+
 files_refs_set_t
 Index::get_files_containing_words(std::vector<std::string> words) noexcept
 {
