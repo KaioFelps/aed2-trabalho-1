@@ -26,9 +26,14 @@ private:
   words_map_t words;
 
   /**
-   * Associa a palavra ao arquivo através do seu ID interno.
+   * Retorna uma referência envelopada para garantir que o *calee* não copie
+   * o arquivo na hora de retornar o conjunto de referências acidentalmente.
+   *
+   * Isso impede que esse bug volte a acontecer (referências nulas são iguais
+   * num conjunto, então diferentes arquivos nunca são inseridos pois são
+   * igualmente nulos).
    */
-  void add_word_from_file_by_file_id(std::string word, std::string id) noexcept;
+  std::reference_wrapper<File> get_file_by_id(const uint64_t &id);
 
 public:
   Index();
