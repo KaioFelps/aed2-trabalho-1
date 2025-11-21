@@ -154,4 +154,28 @@ void IndexSerializer::remove_data_files() noexcept
   remove(this->data_dir / this->words_file);
 }
 
+void IndexSerializer::serialize_words_map(const words_map_t &words_map,
+                                          std::ostream &wstream)
+{
+  const auto map_size = static_cast<uint32_t>(words_map.size());
+  wstream.write(reinterpret_cast<const char *>(&map_size), sizeof(uint32_t));
+
+  for (const auto &pair : words_map)
+  {
+    const auto key_size = static_cast<uint32_t>(pair.first.size());
+    wstream.write(reinterpret_cast<const char *>(&key_size), sizeof(uint32_t));
+
+    const auto ids_set_size = static_cast<uint32_t>(pair.second.size());
+    wstream.write(reinterpret_cast<const char *>(&ids_set_size),
+                  sizeof(uint32_t));
+
+    wstream.write(pair.first.data(), key_size);
+
+    for (const auto &id : pair.second)
+    {
+      wstream.write(reinterpret_cast<const char *>(&id), sizeof(uint64_t));
+    }
+  }
+}
+
 } // namespace core

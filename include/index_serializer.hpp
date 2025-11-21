@@ -32,6 +32,9 @@ private:
   deserialize_files_set(std::istream &rstream,
                         const std::filesystem::path &data_file_path);
 
+  static void serialize_words_map(const words_map_t &words_map,
+                                  std::ostream &wstream);
+
 public:
   IndexSerializer(std::filesystem::path data_dir,
                   std::filesystem::path words_file,
