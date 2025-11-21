@@ -35,6 +35,9 @@ private:
   static void serialize_words_map(const words_map_t &words_map,
                                   std::ostream &wstream);
 
+  static void serialize_files_set(const std::vector<File> &files,
+                                  std::ostream &wstream);
+
 public:
   IndexSerializer(std::filesystem::path data_dir,
                   std::filesystem::path words_file,

@@ -2,7 +2,6 @@
 
 #include "index_serializer.hpp"
 #include <catch2/catch_all.hpp>
-#include <iostream>
 
 TEST_CASE("Deveria conseguir serializar um mapa de palavras de modo que ele "
           "possa ser deserializado posteriormente corretamente",
@@ -35,5 +34,36 @@ TEST_CASE("Deveria conseguir serializar um mapa de palavras de modo que ele "
     REQUIRE(deserialized_map.find("samambaiaçu")->second.contains(3));
     REQUIRE(deserialized_map.find("samambaiaçu")->second.contains(53));
     REQUIRE(deserialized_map.find("samambaiaçu")->second.contains(10));
+  }
+}
+
+TEST_CASE("Deveria conseguir serializar o vetor de arquivos conforme o "
+          "protocolo binário, de modo que ele possa ser deserializado "
+          "posteriormente corretamente",
+          "[internal, serialization, serialize_files_set]")
+{
+  std::vector<core::File> files = {
+      core::File("/foo.txt"),
+      core::File("/bar.txt"),
+  };
+
+  auto stream = std::stringstream();
+  core::IndexSerializer::serialize_files_set(files, stream);
+
+  stream.seekg(0, std::ios::beg);
+  auto deserialized_files =
+      core::IndexSerializer::deserialize_files_set(stream, "mock.dat");
+
+  SECTION("Deveria retornar um vetor com tamanho exato ao original")
+  {
+    REQUIRE(files.size() == deserialized_files.size());
+  }
+
+  SECTION("Deveria recriar o vetor de forma idêntica ao original")
+  {
+    for (size_t i = 0; i < files.size(); i++)
+    {
+      REQUIRE(files[i] == deserialized_files[i]);
+    }
   }
 }

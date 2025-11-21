@@ -178,4 +178,18 @@ void IndexSerializer::serialize_words_map(const words_map_t &words_map,
   }
 }
 
+void IndexSerializer::serialize_files_set(const std::vector<File> &files,
+                                          std::ostream &wstream)
+{
+  const auto files_size = static_cast<uint32_t>(files.size());
+  wstream.write(reinterpret_cast<const char *>(&files_size), sizeof(uint32_t));
+
+  for (const auto &file : files)
+  {
+    const auto path_size = static_cast<uint32_t>(file.get_path().size());
+    wstream.write(reinterpret_cast<const char *>(&path_size), sizeof(uint32_t));
+    wstream.write(file.get_path().data(), path_size);
+  }
+}
+
 } // namespace core
