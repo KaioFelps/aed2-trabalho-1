@@ -106,11 +106,12 @@ TEST_CASE("Não deveria separar palavras unidas por conectores",
           "[internal, process, allowed_connectors, is_connected]")
 {
   const auto processor = core::TextProcessor();
-  const auto input = "É um não-não!";
+  const auto input = "É um não-não! it's they're p/todos";
   auto input_stream = std::istringstream(input);
 
   const auto words = processor.process(input_stream);
-  const auto expected_words = std::vector<std::string>{"e", "um", "nao-nao"};
+  const auto expected_words = std::vector<std::string>{
+      "e", "um", "nao-nao", "it's", "they're", "p/todos"};
 
   REQUIRE(std::ranges::is_permutation(words, expected_words));
 }
