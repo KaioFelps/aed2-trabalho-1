@@ -1,5 +1,5 @@
 {
-    "outputFileName": "estrutura-de-dados",
+    "outputFileName": "indexer",
     "buildDir": "build",
     "compiler": "g++",
     "compilerFlags": ["-std=c++20", "-Wall", "-Wextra"],
