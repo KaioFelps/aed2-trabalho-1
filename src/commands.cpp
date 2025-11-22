@@ -33,22 +33,41 @@ std::vector<std::string> Command::parse_arguments(const int argc,
   return arguments;
 }
 
+static void require_arguments(const std::vector<std::string> &args,
+                              const size_t count)
+{
+
+  if (args.size() < count)
+  {
+    throw std::runtime_error(
+        "Quantidade insuficiente de argumentos para este comando. Refira-se "
+        "ao README.md para instruções.");
+  }
+}
+
 std::unique_ptr<Command>
 CommandsFactory::get_command(const std::vector<std::string> &args)
 {
+
   if (args[0] == "indice")
   {
-    if (args.size() < 4)
+    if (args.size() < 2)
     {
-      throw std::runtime_error(
-          "Quantidade insuficiente de argumentos para este comando. Refira-se "
-          "ao README.md para instruções.");
+      throw std::runtime_error("Subcomando não especificado. Refira-se ao "
+                               "README.md para instruções.");
     }
 
-    if (args[1] == "construir")
+    const auto subcommand = args[1];
+    auto args_subvec = std::span(std::next(args.begin(), 2), args.end());
+    if (subcommand == "construir")
     {
-      auto args_subvec = std::span(std::next(args.begin(), 2), args.end());
+      require_arguments(args, 4);
       return IndexBuildCommand::from_args(args_subvec);
+    }
+    if (subcommand == "buscar")
+    {
+      require_arguments(args, 3);
+      return IndexSearchCommand::from_args(args_subvec);
     }
   }
 

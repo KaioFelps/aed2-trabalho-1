@@ -22,3 +22,4 @@ public:
 
 #include "commands/factory.hpp"
 #include "commands/index_build.hpp"
+#include "commands/index_search.hpp"
