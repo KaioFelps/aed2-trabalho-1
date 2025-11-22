@@ -26,6 +26,15 @@ const auto diacritics_removal_map =
         {"Ù", "U"}, {"Ú", "U"}, {"Ü", "U"}, {"Û", "U"}, {"ç", "c"}, {"Ç", "C"},
     };
 
+bool is_ascii(uint8_t character);
+bool is_lower_case_letter(uint8_t character);
+bool is_upper_case_letter(uint8_t character);
+bool is_alpha(uint8_t character);
+bool is_connected(std::string &buffer, uint8_t character);
+uint8_t to_lower_case(const uint8_t character);
+void make_lower_case(std::string &buffer);
+void remove_diacritics(std::string &word);
+
 } // namespace text_processor_internal
 
 class TextProcessor
@@ -42,16 +51,7 @@ private:
    */
   std::unordered_set<std::string> stopwords;
 
-  bool is_ascii(uint8_t character) const;
-  bool is_lower_case_letter(uint8_t character) const;
-  bool is_upper_case_letter(uint8_t character) const;
-  bool is_alpha(uint8_t character) const;
   bool is_stopword(std::string &buffer) const;
-  bool is_connected(std::string &buffer, uint8_t character) const;
-
-  uint8_t to_lower_case(const uint8_t character) const;
-  void make_lower_case(std::string &buffer) const;
-  void remove_diacritics(std::string &word) const;
 
 public:
   TextProcessor();

@@ -13,18 +13,12 @@ TextProcessor::TextProcessor(std::unordered_set<std::string> stopwords)
 
 std::vector<std::string> TextProcessor::process(std::istream &stream) const
 {
+  using namespace text_processor_internal;
+
   auto output = std::vector<std::string>();
   auto buffer = std::string();
   auto non_ascii_buffer = std::string();
   auto is_reading_non_ascii = false;
-
-  const auto flush_non_ascii_buffer = [&non_ascii_buffer, &buffer, this]()
-  {
-    this->remove_diacritics(non_ascii_buffer);
-    this->make_lower_case(non_ascii_buffer);
-    buffer.append(non_ascii_buffer);
-    non_ascii_buffer.clear();
-  };
 
   std::string byte;
   byte.reserve(1);
@@ -32,7 +26,7 @@ std::vector<std::string> TextProcessor::process(std::istream &stream) const
   {
     uint8_t character = byte[0];
 
-    if (!this->is_ascii(character))
+    if (!is_ascii(character))
     {
       is_reading_non_ascii = true;
       non_ascii_buffer.push_back(character);
@@ -42,47 +36,29 @@ std::vector<std::string> TextProcessor::process(std::istream &stream) const
     if (is_reading_non_ascii)
     {
       is_reading_non_ascii = false;
-      flush_non_ascii_buffer();
+      remove_diacritics(non_ascii_buffer);
+      make_lower_case(non_ascii_buffer);
+      buffer.append(non_ascii_buffer);
+      non_ascii_buffer.clear();
     }
 
-    if (this->is_alpha(character) || this->is_connected(buffer, character))
+    if (is_alpha(character) || is_connected(buffer, character))
     {
-      character = this->to_lower_case(character);
+      character = to_lower_case(character);
       buffer.push_back(character);
       continue;
     }
 
     if (!buffer.empty())
     {
-      if (!this->is_stopword(buffer)) output.push_back(buffer);
+      if (!is_stopword(buffer)) output.push_back(buffer);
       buffer.clear();
     }
   }
 
-  if (!buffer.empty() && !this->is_stopword(buffer)) output.push_back(buffer);
+  if (!buffer.empty() && !is_stopword(buffer)) output.push_back(buffer);
 
   return output;
-}
-
-bool TextProcessor::is_ascii(uint8_t character) const
-{
-  return character <= 127;
-}
-
-bool TextProcessor::is_lower_case_letter(uint8_t character) const
-{
-  return character >= 97 && character <= 122;
-}
-
-bool TextProcessor::is_upper_case_letter(uint8_t character) const
-{
-  return character >= 65 && character <= 90;
-}
-
-bool TextProcessor::is_alpha(uint8_t character) const
-{
-  return this->is_upper_case_letter(character) ||
-         this->is_lower_case_letter(character);
 }
 
 bool TextProcessor::is_stopword(std::string &buffer) const
@@ -90,7 +66,27 @@ bool TextProcessor::is_stopword(std::string &buffer) const
   return this->stopwords.contains(buffer);
 }
 
-bool TextProcessor::is_connected(std::string &buffer, uint8_t character) const
+namespace text_processor_internal
+{
+
+bool is_ascii(uint8_t character) { return character <= 127; }
+
+bool is_lower_case_letter(uint8_t character)
+{
+  return character >= 97 && character <= 122;
+}
+
+bool is_upper_case_letter(uint8_t character)
+{
+  return character >= 65 && character <= 90;
+}
+
+bool is_alpha(uint8_t character)
+{
+  return is_upper_case_letter(character) || is_lower_case_letter(character);
+}
+
+bool is_connected(std::string &buffer, uint8_t character)
 {
   auto is_connector = false;
   for (auto &connector : text_processor_internal::allowed_connectors)
@@ -105,17 +101,17 @@ bool TextProcessor::is_connected(std::string &buffer, uint8_t character) const
   return is_connector && !buffer.empty();
 }
 
-void TextProcessor::make_lower_case(std::string &buffer) const
+void make_lower_case(std::string &buffer)
 {
   for (size_t i = 0; i < buffer.size(); i++)
   {
-    buffer[i] = this->to_lower_case(buffer[i]);
+    buffer[i] = to_lower_case(buffer[i]);
   }
 }
 
-uint8_t TextProcessor::to_lower_case(const uint8_t character) const
+uint8_t to_lower_case(const uint8_t character)
 {
-  if (this->is_upper_case_letter(character))
+  if (is_upper_case_letter(character))
   {
     const uint8_t difference_between_casing = 32;
     return character + difference_between_casing;
@@ -124,7 +120,7 @@ uint8_t TextProcessor::to_lower_case(const uint8_t character) const
   return character;
 }
 
-void TextProcessor::remove_diacritics(std::string &word) const
+void remove_diacritics(std::string &word)
 {
   for (auto &diacritic : text_processor_internal::diacritics_removal_map)
   {
@@ -136,5 +132,7 @@ void TextProcessor::remove_diacritics(std::string &word) const
     }
   }
 }
+
+} // namespace text_processor_internal
 
 } // namespace core

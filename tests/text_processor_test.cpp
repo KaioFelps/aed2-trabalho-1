@@ -3,6 +3,8 @@
 #include "text_processor.hpp"
 #include <catch2/catch_all.hpp>
 
+using namespace core::text_processor_internal;
+
 TEST_CASE("Espaços em branco devem ser stopwords implícitos",
           "[internal, process, stopwords]")
 {
@@ -41,13 +43,12 @@ TEST_CASE("Deveria transformar maiúsculas em minúsculas e não alterar outros 
           "caracteres",
           "[internal, make_lower_case]")
 {
-  const auto processor = core::TextProcessor();
 
   SECTION("deveria transformar maiúsculas em minúsculas")
   {
     for (char letter = 65; letter <= 90; letter++)
     {
-      REQUIRE(processor.to_lower_case(letter) == letter + 32);
+      REQUIRE(to_lower_case(letter) == letter + 32);
     }
   }
 
@@ -55,7 +56,7 @@ TEST_CASE("Deveria transformar maiúsculas em minúsculas e não alterar outros 
   {
     for (char non_letter = 0; non_letter < 65; non_letter++)
     {
-      REQUIRE(processor.to_lower_case(non_letter) == non_letter);
+      REQUIRE(to_lower_case(non_letter) == non_letter);
     }
   }
 
@@ -64,8 +65,7 @@ TEST_CASE("Deveria transformar maiúsculas em minúsculas e não alterar outros 
     for (char already_lower_case = 97; already_lower_case <= 122;
          already_lower_case++)
     {
-      REQUIRE(processor.to_lower_case(already_lower_case) ==
-              already_lower_case);
+      REQUIRE(to_lower_case(already_lower_case) == already_lower_case);
     }
   }
 }
@@ -73,10 +73,9 @@ TEST_CASE("Deveria transformar maiúsculas em minúsculas e não alterar outros 
 TEST_CASE("Deveria remover os acentos configurados",
           "[internal, remove_diacritics]")
 {
-  const auto processor = core::TextProcessor();
   std::string input = "coração não pão É Ô ä ü";
   const auto expected = "coracao nao pao E O a u";
-  processor.remove_diacritics(input);
+  remove_diacritics(input);
   REQUIRE(input == expected);
 }
 
