@@ -22,6 +22,17 @@ Indexer::Indexer(fs::path index_data_dir, TextProcessor processor)
 {
 }
 
+files_refs_set_t Indexer::get_files_with_words(std::vector<std::string> words)
+{
+  auto normalized_words = std::vector<std::string>();
+  for (auto &word : words)
+  {
+    normalized_words.push_back(TextProcessor::normalize_word(word));
+  }
+
+  return this->get_index().get_files_containing_words(normalized_words);
+}
+
 Index &Indexer::get_index() noexcept(false)
 {
   if (!this->index.has_value())

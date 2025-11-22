@@ -53,7 +53,7 @@ public:
    * Obtém um conjunto de arquivos contendo a palavra `word`.
    */
   files_refs_set_t
-  get_files_containing_words(std::vector<std::string> word) noexcept;
+  get_files_containing_words(std::vector<std::string> words) noexcept;
 };
 
 class Indexer
@@ -70,7 +70,11 @@ private:
   void parse_entry(std::filesystem::path path);
 
 public:
-  Indexer(std::filesystem::path index_data_dir);
+  Indexer(std::filesystem::path index_data_dir, TextProcessor processor);
+  /**
+   * Normaliza as palavras e tenta encontrar os arquivos que contêm todas elas.
+   */
+  files_refs_set_t get_files_with_words(std::vector<std::string> words);
   /**
    * Obtém a instância corrente do indexador.
    */
