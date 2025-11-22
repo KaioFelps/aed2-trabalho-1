@@ -61,6 +61,11 @@ public:
    * minúsculo. Palavras definidas em `stopwords_file` são excluídas.
    */
   std::vector<std::string> process(std::istream &stream) const;
+  /**
+   * Performa uma normalização simples em cima da palavra `word` de modo
+   * a torná-la um indexador válido.
+   */
+  static std::string normalize_word(std::string word);
 };
 
 } // namespace core

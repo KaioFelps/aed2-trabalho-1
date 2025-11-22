@@ -11,6 +11,14 @@ TextProcessor::TextProcessor(std::unordered_set<std::string> stopwords)
 {
 }
 
+std::string TextProcessor::normalize_word(std::string word)
+{
+  using namespace text_processor_internal;
+  remove_diacritics(word);
+  make_lower_case(word);
+  return word;
+}
+
 std::vector<std::string> TextProcessor::process(std::istream &stream) const
 {
   using namespace text_processor_internal;
