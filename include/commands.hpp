@@ -19,3 +19,6 @@ public:
 };
 
 } // namespace gateways::commands
+
+#include "commands/factory.hpp"
+#include "commands/index_build.hpp"

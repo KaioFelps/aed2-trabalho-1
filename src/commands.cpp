@@ -1,0 +1,79 @@
+#include "commands.hpp"
+#include "commands/factory.hpp"
+#include <vector>
+
+namespace gateways::commands
+{
+
+std::vector<std::string> Command::parse_arguments(const int argc,
+                                                  const char *argv[])
+{
+  auto arguments = std::vector<std::string>();
+
+  for (int i = 0; i < argc; i++)
+  {
+    auto argument_chars = argv[i];
+    std::string argument;
+    while (*argument_chars != 0)
+    {
+      argument.push_back(*argument_chars);
+      argument_chars++;
+    }
+    arguments.push_back(argument);
+  }
+
+  if (arguments.size() <= 1)
+  {
+    throw std::runtime_error("Você não inseriu nenhum comando! Refira-se ao "
+                             "README.md para instruções sobre o programa.");
+  }
+
+  arguments.erase(arguments.begin());
+  return arguments;
+}
+
+std::unique_ptr<Command>
+CommandsFactory::get_command(const std::vector<std::string> &args)
+{
+  if (args[0] == "indice")
+  {
+    if (args.size() < 4)
+    {
+      throw std::runtime_error(
+          "Quantidade insuficiente de argumentos para este comando. Refira-se "
+          "ao README.md para instruções.");
+    }
+
+    if (args[1] == "construir")
+    {
+      if (args[2] != "--path" && (args[2] != "-p"))
+      {
+        throw std::runtime_error(
+            "Argumentos inválidos para o comando `indice construir`. Refira-se "
+            "ao README.md para instruções.");
+      }
+
+      auto path = std::filesystem::path(args[3]);
+      if (!std::filesystem::exists(path))
+      {
+        throw std::runtime_error("O caminho " + args[3] +
+                                 "não é um caminho válido.");
+      }
+
+      return std::make_unique<IndexBuildCommand>(path);
+    }
+  }
+
+  std::string concatenated_command;
+  for (auto &piece : args)
+  {
+    concatenated_command += piece + " ";
+  }
+
+  throw std::runtime_error("Você digitou um comando que não existe (" +
+                           concatenated_command +
+                           ") .Refira - se ao REAMDE.md para instruções sobre "
+                           "como e quais comandos utilizar.");
+}
+
+}; // namespace gateways::commands
