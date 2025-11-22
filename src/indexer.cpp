@@ -1,6 +1,7 @@
 #include "indexer.hpp"
 #include "index_serializer.hpp"
 #include <cassert>
+#include <fstream>
 
 namespace fs = std::filesystem;
 
@@ -16,8 +17,8 @@ const fs::path WORDS_DATA_FILE = "index.dat";
  */
 const fs::path FILES_MAP_DATA_FILE = "files_map.dat";
 
-Indexer::Indexer(std::filesystem::path index_data_dir)
-    : index_data_dir(index_data_dir)
+Indexer::Indexer(fs::path index_data_dir, TextProcessor processor)
+    : index_data_dir(index_data_dir), processor(processor)
 {
 }
 
@@ -63,6 +64,43 @@ void Indexer::flush() const noexcept(false)
 bool Indexer::has_loaded_index() const noexcept(true)
 {
   return this->index.has_value();
+}
+
+void Indexer::build(fs::path lookup_dir)
+{
+  this->index = Index();
+  this->parse_entry(lookup_dir);
+}
+
+void Indexer::parse_entry(fs::path path)
+{
+  assert(this->index.has_value() && "Tried to call `Indexer::parse_entry` but "
+                                    "there is no `Index` instance stored.");
+
+  if (fs::is_regular_file(path))
+  {
+    auto stream = std::ifstream(path);
+    auto words = this->processor.process(stream);
+
+    for (auto &word : words)
+    {
+      this->index->add_word_from_file(std::move(word), path);
+    }
+
+    return;
+  }
+  if (fs::is_directory(path))
+  {
+    for (auto entry : fs::directory_iterator(path))
+    {
+      parse_entry(entry.path());
+    }
+
+    return;
+  }
+
+  throw std::runtime_error("Não foi possível varrer o diretório/arquivo " +
+                           path.string() + ".");
 }
 
 } // namespace core

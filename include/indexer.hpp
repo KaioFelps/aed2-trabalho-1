@@ -1,6 +1,7 @@
 #pragma once
 
 #include "file.hpp"
+#include "text_processor.hpp"
 #include <filesystem>
 #include <optional>
 #include <set>
@@ -64,6 +65,9 @@ private:
 #endif
   std::filesystem::path index_data_dir;
   std::optional<Index> index;
+  TextProcessor processor;
+
+  void parse_entry(std::filesystem::path path);
 
 public:
   Indexer(std::filesystem::path index_data_dir);
@@ -71,6 +75,10 @@ public:
    * Obtém a instância corrente do indexador.
    */
   Index &get_index();
+  /**
+   * Varre o diretório `lookup_dir` lendo todos os arquivos
+   */
+  void build(std::filesystem::path lookup_dir);
   /**
    * Carrega os dados de arquivos na memória.
    */
