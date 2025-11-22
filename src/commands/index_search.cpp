@@ -50,6 +50,7 @@ void IndexSearchCommand::execute(AppContext &ctx)
 std::unique_ptr<IndexSearchCommand>
 IndexSearchCommand::from_args(std::span<const std::string> args)
 {
+  CommandsFactory::required_arguments(args, 1);
   return std::make_unique<IndexSearchCommand>(
       std::vector(args.begin(), args.end()));
 }

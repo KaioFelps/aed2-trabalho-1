@@ -21,14 +21,10 @@ void IndexBuildCommand::execute(AppContext &ctx)
 std::unique_ptr<IndexBuildCommand>
 IndexBuildCommand::from_args(std::span<const std::string> args)
 {
-  if (args[0] != "--path" && (args[0] != "-p"))
-  {
-    throw std::runtime_error(
-        "Argumentos inválidos para o comando `indice construir`. Refira-se "
-        "ao README.md para instruções.");
-  }
+  CommandsFactory::required_arguments(args, 1);
 
-  auto path = std::filesystem::path(args[1]);
+  auto path = std::filesystem::path(args[0]);
+
   if (!std::filesystem::exists(path))
   {
     throw std::runtime_error("O caminho " + path.string() +
