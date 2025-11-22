@@ -14,6 +14,10 @@ Resolução do trabalho 1 da matéria de Algoritmos e Estruturas de Dados 2.
   - busca os arquivos que contém <termo_de_busca> e os imprime no terminal.
 - [x] Serialização e Deserialização:
   - implementação de (de)serialização está especificada no documento [Serialização].
+- [x] Pré-processamento de palavras:
+  - [x] remover pontuações;
+  - [x] converter maiúsculas para minúsculas;
+  - [x] eliminar stopwords.
 
 [Serialização]: ./docs/serialization.md
 
