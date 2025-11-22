@@ -40,7 +40,10 @@ Lê o arquivo de texto ou atravessa o diretório lendo todos os arquivos nele co
 para construir o índice. O caminho funciona de forma relativa a este diretório. Os
 arquivos serão, posteriormente, representados por seus caminhos canônicos.
 
-### Buscando
+A construção do índice sobrescreve a construção de índices anteriores. Esse comando
+não incrementa um índice já existente.
+
+### Realizando buscas
 `<executável> indice buscar <termo1> [<termo2> <termo3> ... <termon>]`
 - executável: o caminho para o executável gerado. Por padrão, `./build/indexer`.
 - termo: uma palavra ASCII ou UTF-8. Termos separados por espaços são interpretados
