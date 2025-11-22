@@ -90,12 +90,13 @@ void Indexer::parse_entry(fs::path path)
 
   if (fs::is_regular_file(path))
   {
+    auto canonical_path = fs::canonical(path);
     auto stream = std::ifstream(path);
     auto words = this->processor.process(stream);
 
     for (auto &word : words)
     {
-      this->index->add_word_from_file(std::move(word), path);
+      this->index->add_word_from_file(std::move(word), canonical_path);
     }
 
     return;
