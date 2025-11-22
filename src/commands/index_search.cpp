@@ -18,12 +18,6 @@ void IndexSearchCommand::execute(AppContext &ctx)
   }
 
   ctx.indexer.try_load();
-  if (!ctx.indexer.has_loaded_index())
-  {
-    std::cout << "Você ainda não tem um índice =(. Refira-se ao README.md para "
-                 "instruções sobre como criar um.\n";
-    return;
-  }
 
   auto files = ctx.indexer.get_files_with_words(this->terms);
   if (this->terms.size() == 1)
