@@ -2,7 +2,7 @@
 Resolução do trabalho 1 da matéria de Algoritmos e Estruturas de Dados 2.
 
 ## Requisitos
-- [] Ser compilável via Makefile;
+- [x] Ser compilável via Makefile;
 - [x] Modo Indexação:
   - `indice construir <caminho_do_diretório>`
   - varre o diretório especificado, constrói o índice invertido e o salva
@@ -23,7 +23,7 @@ Resolução do trabalho 1 da matéria de Algoritmos e Estruturas de Dados 2.
 
 ## Rodando a aplicação
 Para simplesmente rodar o executável deste programa, utilize o comando
-`make build`. Essa forma de compilação só está disponível para sistemas
+`make`. Essa forma de compilação só está disponível para sistemas
 UNIX.
 
 ### Notação
