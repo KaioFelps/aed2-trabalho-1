@@ -69,11 +69,6 @@ bool TextProcessor::is_ascii(uint8_t character) const
   return character <= 127;
 }
 
-bool TextProcessor::is_utf8_initial_byte(uint8_t byte) const
-{
-  return (byte & 0b11000000) == 0b11000000;
-}
-
 bool TextProcessor::is_lower_case_letter(uint8_t character) const
 {
   return character >= 97 && character <= 122;

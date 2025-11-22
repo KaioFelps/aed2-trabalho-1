@@ -43,23 +43,6 @@ private:
   std::unordered_set<std::string> stopwords;
 
   bool is_ascii(uint8_t character) const;
-  /**
-   * Um caractere utf-8 tem, no primeiro byte que o compõe, um padrão
-   * que informa quantos bytes a serem processados pertencem a este caractere.
-   *
-   * Por exemplo,
-   * - 110xxxx -> utf-8
-   * - 1110xxxx -> utf-16
-   * - 11110xxx -> utf-32
-   *
-   * Os bytes seguintes têm seus 2 bits mais significantes iguais a `10`. A
-   * concatenação dos bits úteis formam o caractere que se quer representar de
-   * fato.
-   *
-   * Para verificar se o presente byte marca o início de um caractere, basta
-   * checar esse padrão.
-   */
-  bool is_utf8_initial_byte(uint8_t byte) const;
   bool is_lower_case_letter(uint8_t character) const;
   bool is_upper_case_letter(uint8_t character) const;
   bool is_alpha(uint8_t character) const;
