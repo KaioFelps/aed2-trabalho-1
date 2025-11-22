@@ -1,5 +1,6 @@
 #include "commands.hpp"
 #include "commands/factory.hpp"
+#include <span>
 #include <vector>
 
 namespace gateways::commands
@@ -46,21 +47,8 @@ CommandsFactory::get_command(const std::vector<std::string> &args)
 
     if (args[1] == "construir")
     {
-      if (args[2] != "--path" && (args[2] != "-p"))
-      {
-        throw std::runtime_error(
-            "Argumentos inválidos para o comando `indice construir`. Refira-se "
-            "ao README.md para instruções.");
-      }
-
-      auto path = std::filesystem::path(args[3]);
-      if (!std::filesystem::exists(path))
-      {
-        throw std::runtime_error("O caminho " + args[3] +
-                                 "não é um caminho válido.");
-      }
-
-      return std::make_unique<IndexBuildCommand>(path);
+      auto args_subvec = std::span(std::next(args.begin(), 2), args.end());
+      return IndexBuildCommand::from_args(args_subvec);
     }
   }
 
