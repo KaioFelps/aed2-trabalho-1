@@ -29,7 +29,7 @@ const auto diacritics_removal_map =
 bool is_ascii(uint8_t character);
 bool is_lower_case_letter(uint8_t character);
 bool is_upper_case_letter(uint8_t character);
-bool is_alpha(uint8_t character);
+bool is_alphanumeric(uint8_t character);
 bool is_connected(std::string &buffer, uint8_t character);
 uint8_t to_lower_case(const uint8_t character);
 void make_lower_case(std::string &buffer);

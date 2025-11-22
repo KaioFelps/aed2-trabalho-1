@@ -42,7 +42,7 @@ std::vector<std::string> TextProcessor::process(std::istream &stream) const
       non_ascii_buffer.clear();
     }
 
-    if (is_alpha(character) || is_connected(buffer, character))
+    if (is_alphanumeric(character) || is_connected(buffer, character))
     {
       character = to_lower_case(character);
       buffer.push_back(character);
@@ -81,9 +81,11 @@ bool is_upper_case_letter(uint8_t character)
   return character >= 65 && character <= 90;
 }
 
-bool is_alpha(uint8_t character)
+bool is_alphanumeric(uint8_t character)
 {
-  return is_upper_case_letter(character) || is_lower_case_letter(character);
+  const auto is_number_char = character >= 48 && character <= 57;
+  return is_upper_case_letter(character) || is_lower_case_letter(character) ||
+         is_number_char;
 }
 
 bool is_connected(std::string &buffer, uint8_t character)
