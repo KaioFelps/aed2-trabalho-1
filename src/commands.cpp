@@ -67,14 +67,18 @@ CommandsFactory::get_command(const std::vector<std::string> &args)
   }
 
   std::string concatenated_command;
-  for (auto &piece : args)
+  for (size_t i = 0; i < args.size(); i++)
   {
-    concatenated_command += piece + " ";
+    concatenated_command += args[i];
+    if (args.size() > 1 && i != args.size() - 1)
+    {
+      concatenated_command += " ";
+    }
   }
 
   throw std::runtime_error("Você digitou um comando que não existe (" +
                            concatenated_command +
-                           ") .Refira - se ao REAMDE.md para instruções sobre "
+                           "). Refira-se ao REAMDE.md para instruções sobre "
                            "como e quais comandos utilizar.");
 }
 
