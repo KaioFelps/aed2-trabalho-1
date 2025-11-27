@@ -1,4 +1,5 @@
 #include "helpers.hpp"
+#include <algorithm>
 #include <fstream>
 
 namespace core::helpers
